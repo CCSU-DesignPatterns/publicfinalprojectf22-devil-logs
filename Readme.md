@@ -15,23 +15,13 @@ Classes:
 
 - Level - provides some means of description and comparison when logging.
     - Levels: MAX, HIGH, MID, LOW
-- LogRecord - defines how some logging information must be passed to the Logger.Log method.
+- LogRecord - define how some logging information must be passed to the Logger.Log method.
 - LogRecordBuilder - provides an ergonomic way to create a log record.
 - Logger - singleton class to facilitate logging.
 - Handler - filters and directs LogRecords
-
-## Design Patterns
-
-- Singleton 
-    - Logger.java 
-- Builder (SimpleBuilder)
-    - LogRecordBuilder.java
-- Strategy - 
-    - Handler.java
-
-# Prospective Patterns
-- Chain of reponsibility (Handlers)
-- Template Pattern (Serializer/Parser)
+- Auditing Package
+    - Auditor - party responsible for tracking changes on subject
+    - Audit Subject - object on which changes are tracked
 
 ## Reporting security issues and bugs
 
