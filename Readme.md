@@ -46,7 +46,7 @@ var logger = Logger.getInstance();
 // Construct the simple Console Handler (default log level LOW - logs messages LOW)
 var console = new ConsoleHandler();
 //log level can be set on the handler using setLevel method - logs messages of given level
-console.setLevel(Level.MAX); - now console handler logs messages of Max level
+console.setLevel(Level.MAX); // now console handler logs messages of Max level
 EncryptedHandler enc = new EncryptedHandler(console); //Optional - used to encrypt log messages, can be added on all handlers
 // add the decorated handler
 logger.addHandler(enc);
