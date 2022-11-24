@@ -67,6 +67,28 @@ var lastHundred = logger.getRetainedRecords();
 for(var retainedRecord: lastHundred) {
     System.out.print(retainedRecord.toString());
 }
+
+// AuditLogger: To use this you must have a class that implements devillogs.auditing.Subject interface
+// a basic implementation of this interface is provided in the AuditSubject class, which can be extended
+// as shown below
+
+class ConcreteSubject extends AuditSubject {
+	public String data = "";
+}
+
+ConcreteSubject subject = new ConcreteSubject();
+AuditLogger auditLogger = new AuditLogger();
+subject.subscribe(auditLogger);
+
+// when the subject updates the subscribers, the AuditLogger will use a logger instance to log the subject's current state
+subject.updateSubscribers();
+
+// the AuditLogger can create a Memento of the current subject's state
+Memento subjectMemento = auditLogger.createMemento();
+
+// the AuditLogger can also restore itself from a provided Memento
+auditLogger.restore(subjectMemento);
+
 ```
 
 ### Auditing Package
