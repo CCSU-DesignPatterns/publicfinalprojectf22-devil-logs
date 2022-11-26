@@ -9,7 +9,6 @@ devillogs.logging; Delivering minimalist and intuitive logging functionality wit
 * [Yerapothina, Navya Bhargavi](https://github.com/NavyaBhargaviYerapothina)
 
 
-
 ## Get Started
 
 ### Logging Package
@@ -19,8 +18,14 @@ devillogs.logging; Delivering minimalist and intuitive logging functionality wit
     - Levels: MAX, ERROR, WARN, INFO
 - LogRecord - define how some logging information must be passed to the Logger.Log method.
 - LogRecordBuilder (nested in LogRecord) - provides an ergonomic way to create a log record.
-- Handler - filters and directs LogRecords
-- Formatter - Formats the LogRecords before logging
+- Handler - filters and directs LogRecords.
+- StreamHandler - logs the messages to given outputstream, can be extended to log to any stream
+- ConsoleHandler - logs messages to console.
+- Filehandler - logs messages to given file.
+- Formatter - Formats the LogRecords before logging.
+- SimpleFormatter - Default Format for all the LogRecords before logging - provides brief summary of log record.
+- XMLFormatter - Formats the LogRecords in XML before logging, handler should be set for XMLFormatter.
+- EncryptedHandler - Encrypts the log messages on all handlers before logging, handlers should be decorated with this.
 - BaseLogger - abstract class that defines basic functionality and template methods for derived loggers.
 - Logger - singleton class that extends BaseLogger and implements hooks to facilitate logging.
 
@@ -35,26 +40,55 @@ var lrb = LogRecord.builder()
 // invoke .build to create a LogRecord with Guarenteed Validity
 var record = lrb.build();
 
-// Construct the simple Console Handler (default log level LOW - logs messages LOW)
-var handler = new ConsoleHandler();
 // Get the singleton instance of Logger;
 var logger = Logger.getInstance();
-// add at least one handler
-logger.addHandler(new ConsoleHandler());
+
+// Construct the simple Console Handler (default log level LOW - logs messages LOW)
+var console = new ConsoleHandler();
+//log level can be set on the handler using setLevel method - logs messages of given level
+console.setLevel(Level.MAX); // now console handler logs messages of Max level
+EncryptedHandler enc = new EncryptedHandler(console); //Optional - used to encrypt log messages, can be added on all handlers
+// add the decorated handler
+logger.addHandler(enc);
 
 // Construct the  file Handler (default log level MAX - logs messages MAX and below)
-var handler = new FileHandler("logfile.log");
-// add handler
-logger.addHandler(new FileHandler());
+var file = new FileHandler("logfile.log");
+//By default all handlers log in Simple format, to log in XML format setFormatter for the handler
+file.setFormatter(new XMLFormatter());
+// add the handler
+logger.addHandler(file);
 
+//atleast one handler should be added to logger
 // start logging. 
-logger.log(record);
+logger.log(record); //logs the message based on level and handlers added
 
 // logger class stores 100 most recent logged messages
 var lastHundred = logger.getRetainedRecords();
 for(var retainedRecord: lastHundred) {
     System.out.print(retainedRecord.toString());
 }
+
+// AuditLogger: To use this you must have a class that implements devillogs.auditing.Subject interface
+// a basic implementation of this interface is provided in the AuditSubject class, which can be extended
+// as shown below
+
+class ConcreteSubject extends AuditSubject {
+	public String data = "";
+}
+
+ConcreteSubject subject = new ConcreteSubject();
+AuditLogger auditLogger = new AuditLogger();
+subject.subscribe(auditLogger);
+
+// when the subject updates the subscribers, the AuditLogger will use a logger instance to log the subject's current state
+subject.updateSubscribers();
+
+// the AuditLogger can create a Memento of the current subject's state
+Memento subjectMemento = auditLogger.createMemento();
+
+// the AuditLogger can also restore itself from a provided Memento
+auditLogger.restore(subjectMemento);
+
 ```
 
 ### Auditing Package
@@ -62,11 +96,42 @@ for(var retainedRecord: lastHundred) {
 #### Interfaces
 - Auditor - party responsible for tracking changes on subject
 - Command - defines the interface for Command pattern objects
+- Subject - defines the interface for the Subject in the Observer pattern
 
 #### Classes
-- AuditSubject - object on which changes are tracked
-- AuditLogger - implements the Auditor inteface to act as a logging observer for classes inheriting from AuditSubject
-- PerformanceMonitor - wraps a command pattern object with a stopwatch to monitor the performance of the command execution
+- AuditSubject - object on which changes are tracked (concrete subject of Observer pattern)
+- AuditLogger - implements the Auditor inteface to act as a concrete logging observer for classes inheriting from AuditSubject
+	- Memento - nested static class within AuditLogger used to save off state of the subject of the AuditLogger
+- PerformanceMonitor - wraps a command pattern object with a stopwatch to monitor the performance of the command execution and logs the duration
+
+
+## Design Patterns
+
+- Template 
+    - BaseLogger.java + Logger.java
+- Singleton 
+    - Logger.java 
+- Builder (SimpleBuilder)
+    - LogRecordBuilder nested in LogRecord.java
+- Chain of Responsibility (Handler)
+    - Handler.java
+	- StreamHandler.java
+	- ConsoleHandler.java
+	- FileHandler.java	
+- Strategy (Formatter)
+	- Formatter.java
+	- SimpleFormatter.java
+	- XMLFormatter.java
+- Decorator
+	- EncryptedHandler.java
+- Observer (Auditor and AuditLogger)
+    - Auditor.java
+    - AuditSubject.java
+- Command (Command and PerformanceMonitor)
+	- Command.java
+	- PerformanceMonitor.java
+- Memento
+	- AuditLogger.java
 
 # Potential Design Patterns
 - Factory
