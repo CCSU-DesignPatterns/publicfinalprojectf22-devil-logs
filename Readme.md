@@ -46,7 +46,7 @@ var logger = Logger.getInstance();
 // Construct the simple Console Handler (default log level LOW - logs messages LOW)
 var console = new ConsoleHandler();
 //log level can be set on the handler using setLevel method - logs messages of given level
-console.setLevel(Level.MAX); // now console handler logs messages of Max level
+console.setLevel(Level.MAX); - now console handler logs messages of Max level
 EncryptedHandler enc = new EncryptedHandler(console); //Optional - used to encrypt log messages, can be added on all handlers
 // add the decorated handler
 logger.addHandler(enc);
@@ -67,28 +67,6 @@ var lastHundred = logger.getRetainedRecords();
 for(var retainedRecord: lastHundred) {
     System.out.print(retainedRecord.toString());
 }
-
-// AuditLogger: To use this you must have a class that implements devillogs.auditing.Subject interface
-// a basic implementation of this interface is provided in the AuditSubject class, which can be extended
-// as shown below
-
-class ConcreteSubject extends AuditSubject {
-	public String data = "";
-}
-
-ConcreteSubject subject = new ConcreteSubject();
-AuditLogger auditLogger = new AuditLogger();
-subject.subscribe(auditLogger);
-
-// when the subject updates the subscribers, the AuditLogger will use a logger instance to log the subject's current state
-subject.updateSubscribers();
-
-// the AuditLogger can create a Memento of the current subject's state
-Memento subjectMemento = auditLogger.createMemento();
-
-// the AuditLogger can also restore itself from a provided Memento
-auditLogger.restore(subjectMemento);
-
 ```
 
 ### Auditing Package
@@ -111,8 +89,12 @@ auditLogger.restore(subjectMemento);
     - BaseLogger.java + Logger.java
 - Singleton 
     - Logger.java 
+    - (Game) Many
 - Builder (SimpleBuilder)
     - LogRecordBuilder nested in LogRecord.java
+- State
+    - (Game - Context) WordWithAnL.java
+    - (Game - State) Game.java, UninitializedGame.java, OngoingGame.java, CompletedGame.java
 - Chain of Responsibility (Handler)
     - Handler.java
 	- StreamHandler.java
@@ -124,19 +106,18 @@ auditLogger.restore(subjectMemento);
 	- XMLFormatter.java
 - Decorator
 	- EncryptedHandler.java
+    - (Game) WordWithAnL.java
 - Observer (Auditor and AuditLogger)
     - Auditor.java
     - AuditSubject.java
 - Command (Command and PerformanceMonitor)
 	- Command.java
+        - (Game) PerformanceHook.java + PerformanceInputCommand.java
 	- PerformanceMonitor.java
+        - (Game) WordWithAnL.java
 - Memento
 	- AuditLogger.java
 
-# Potential Design Patterns
-- Factory
-- Mediator
-- Facade
 
 ## Reporting security issues and bugs
 
